@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Launch WishForm</title>
+<style>
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:#f6f8fb;color:#0b1220}
+  main{max-width:720px;margin:8vh auto;padding:28px;text-align:center;border-radius:10px;background:#fff;border:1px solid #e6eef6;box-shadow:0 8px 30px rgba(11,18,32,0.06)}
+  button{cursor:pointer;padding:12px 18px;border-radius:8px;border:0;background:#0ea5a3;color:#fff;font-weight:600}
+  p{color:#475569}
+</style>
+</head>
+<body>
+  <main>
+    <h1>Open WishForm</h1>
+    <p>Click the button below to open WishForm in a new tab or window. Because it will be opened by script, WishForm can call window.close() when it finishes.</p>
+    <button id="openBtn">Open WishForm (auto-close)</button>
+  </main>
+<script>
+  document.getElementById('openBtn').addEventListener('click', function () {
+    // opens Wishform in a script-opened window/tab so it can self-close
+    window.open('Wishform.html', '_blank');
+  });
+</script>
+</body>
+</html>
