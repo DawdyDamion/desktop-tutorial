@@ -47,24 +47,37 @@ body{
   const status = document.getElementById('status');
   let opened = false;
 
+  // desired popup size
+  const POPUP_W = 900;
+  const POPUP_H = 700;
+
+  function centerFeatures(w, h) {
+    const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+    const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+    const outerW = window.outerWidth || document.documentElement.clientWidth;
+    const outerH = window.outerHeight || document.documentElement.clientHeight;
+    const left = Math.max(0, Math.floor(dualScreenLeft + (outerW - w) / 2));
+    const top = Math.max(0, Math.floor(dualScreenTop + (outerH - h) / 2));
+    return `toolbar=0,location=0,status=0,menubar=0,scrollbars=1,resizable=1,width=${w},height=${h},left=${left},top=${top}`;
+  }
+
   function openWish() {
     if (opened) return;
     opened = true;
-    // Try to open via script so WishForm can self-close later
-    const w = window.open('Wishform.html', '_blank');
+    const features = centerFeatures(POPUP_W, POPUP_H);
+    const w = window.open('Wishform.html', '_blank', features);
     if (w) {
       status.textContent = 'WishForm opened.';
       openBtn.classList.add('hidden');
+      try { w.focus(); } catch (e) {}
     } else {
       status.textContent = 'Popup blocked — click Begin again to open.';
       openBtn.classList.remove('hidden');
     }
   }
 
-  // Open on explicit button click
   openBtn.addEventListener('click', openWish);
 
-  // Also open on first click or keypress anywhere (user gesture)
   function onceInteraction() {
     openWish();
     document.removeEventListener('click', onceInteraction);
