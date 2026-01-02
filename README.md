@@ -1,2 +1,2 @@
 Wishform if you wish!
-https://github.com/DawdyDamion/desktop-tutorial/blob/master/wishform.html
+[https://github.com/DawdyDamion/desktop-tutorial/blob/master/wishform.html](https://dawdydamion.github.io/desktop-tutorial/)
