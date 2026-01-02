@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WishForm™</title>
+
+<style>
+:root{
+  --bg:#0f1720; --card:#0b1220; --muted:#aab3c2; --accent:#6ee7b7; --glass:rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(180deg,#071021 0%, #0b1220 100%); color:#e6eef6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+.container{max-width:820px;margin:40px auto;padding:28px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;box-shadow:0 6px 30px rgba(0,0,0,0.6)}
+.brand{margin:0;font-size:20px;letter-spacing:0.6px}
+.tagline{color:var(--muted);margin-top:6px}
+.form{margin-top:18px}
+.field{display:block;margin-bottom:14px}
+.label-text{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+.input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
+.select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
+.row{display:flex;gap:12px}
+.small{flex:1}
+.actions{display:flex;align-items:center;gap:12px;margin-top:8px}
+.btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;background:rgba(255,255,255,0.03);color:inherit}
+.btn.primary{background:linear-gradient(90deg,var(--accent),#5eead4);color:#042014;font-weight:600}
+.spinner{width:20px;height:20px;border-radius:50%;border:3px solid rgba(255,255,255,0.07);border-top-color:var(--accent);opacity:0;transform:scale(0.8);transition:opacity .18s ease,transform .18s ease}
+.spinner.visible{opacity:1;transform:scale(1);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result{margin-top:20px;min-height:110px;opacity:0;transform:translateY(6px);transition:opacity .28s ease,transform .28s ease}
+.result.visible{opacity:1;transform:none}
+.card{padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+.card h3{margin:0 0 6px 0}
+.final{padding:18px;border-radius:10px;background:#071829;border:1px solid rgba(255,255,255,0.04);text-align:left}
+.final h2{margin:0 0 6px 0}
+.final .action{margin-top:8px;color:var(--accent);font-weight:600}
+.foot{margin-top:18px;color:var(--muted);font-size:12px}
+.fade-out{animation:pageFade 2s ease both}
+@keyframes pageFade{to{opacity:0;transform:scale(.98)}}
+/* responsive */
+@media (max-width:560px){.row{flex-direction:column}.container{margin:20px;padding:18px}}
+</style>
+
+</head>
+
+<body>
+
+<main class="container" role="main">
+  <h1 class="brand">WishForm™</h1>
+  <p class="tagline">A suspiciously efficient portal for wildly unrealistic requests.</p>
+
+  <form id="wishForm" class="form" onsubmit="return false;">
+    <label class="field">
+      <span class="label-text">What do you want?</span>
+      <input id="requestInput" class="input" type="text" placeholder="Type your wildly unrealistic request..." maxlength="240" />
+    </label>
+
+    <div class="row">
+      <label class="field small">
+        <span class="label-text">Urgency Level</span>
+        <select id="urgency" class="select">
+          <option>Whenever is fine</option>
+          <option>Soon-ish</option>
+          <option>Before anyone notices</option>
+          <option>Immediately, but pretend it wasn't me</option>
+          <option>Yesterday (not recommended)</option>
+        </select>
+      </label>
+
+      <label class="field small">
+        <span class="label-text">Reality Compliance</span>
+        <select id="reality" class="select">
+          <option>Fully realistic (boring)</option>
+          <option>Mildly improbable</option>
+          <option>Physically questionable</option>
+          <option>Legally ambiguous</option>
+          <option>Cosmically irresponsible</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button id="generateBtn" class="btn primary">Generate Outcome</button>
+      <div id="spinner" class="spinner" aria-hidden="true"></div>
+    </div>
+  </form>
+
+  <section id="resultArea" class="result" aria-live="polite"></section>
+
+  <footer class="foot">WishForm™ is not responsible for outcomes, consequences, or cosmic disturbances.</footer>
+</main>
+
+<script>
+  const btn = document.getElementById('generateBtn');
+  const spinner = document.getElementById('spinner');
+  const resultArea = document.getElementById('resultArea');
+  const input = document.getElementById('requestInput');
+  const urgency = document.getElementById('urgency');
+  const reality = document.getElementById('reality');
+
+  function showCard(html, ms = 1600) {
+    resultArea.innerHTML = html;
+    resultArea.classList.add('visible');
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function runSequence() {
+    btn.disabled = true;
+    spinner.classList.add('visible');
+
+    await new Promise(r => setTimeout(r, 1800));
+    spinner.classList.remove('visible');
+
+    const reqText = input.value.trim() || 'An inscrutable desire';
+    const summary = `
+      <div class="card">
+        <h3>Outcome Generated</h3>
+        <ul>
+          <li><strong>Request:</strong> "${escapeHtml(reqText)}"</li>
+          <li><strong>Urgency:</strong> ${escapeHtml(urgency.value)}</li>
+          <li><strong>Reality Compliance:</strong> ${escapeHtml(reality.value)}</li>
+          <li><strong>Status:</strong> Approved in principle. Denied in practice.</li>
+        </ul>
+        <small>Department of Excessive Convenience</small>
+      </div>
+    `;
+
+    await showCard(summary, 1600);
+
+    const final = `
+      <div class="final">
+        <h2>Outcome Finalized</h2>
+        <p>Request Received: "${escapeHtml(reqText)}"</p>
+        <p>Status: Processed under accelerated compliance.</p>
+        <p>Notes: "This request exceeded the acceptable threshold for convenience."</p>
+        <p class="action">Page will now close for your safety.</p>
+        <small>WishForm™ has initiated Auto-Resolve Protocol 7.</small>
+      </div>
+    `;
+
+    await showCard(final, 2200);
+
+    document.body.classList.add('fade-out');
+    await new Promise(r => setTimeout(r, 2000));
+
+    try {
+      window.close();
+    } catch (e) {
+      resultArea.innerHTML = '<div class="card"><em>Demo: window.close() was blocked by the browser. In an installed app this would close.</em></div>';
+    }
+
+    btn.disabled = false;
+  }
+
+  btn.addEventListener('click', runSequence);
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>\"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"
+    })[c]);
+  }
+</script>
+
+</body>
+</html>
