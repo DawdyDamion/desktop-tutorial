@@ -1,27 +1,78 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Launch WishForm</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WishForm</title>
 <style>
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:#f6f8fb;color:#0b1220}
-  main{max-width:720px;margin:8vh auto;padding:28px;text-align:center;border-radius:10px;background:#fff;border:1px solid #e6eef6;box-shadow:0 8px 30px rgba(11,18,32,0.06)}
-  button{cursor:pointer;padding:12px 18px;border-radius:8px;border:0;background:#0ea5a3;color:#fff;font-weight:600}
-  p{color:#475569}
+:root{
+  --bg:#0f1720; --card:#0b1220; --muted:#aab3c2; --accent:#6ee7b7; --glass:rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(180deg,#071021 0%, #0b1220 100%); color:#e6eef6; -webkit-font-smoothing:antialiased;
+}
+.container{max-width:820px;margin:40px auto;padding:28px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;box-shadow:0 6px 30px rgba(0,0,0,0.6)}
+.brand{margin:0;font-size:20px;letter-spacing:0.6px}
+.tagline{color:var(--muted);margin-top:6px}
+.lead{margin-top:18px;color:var(--muted)}
+.cta{margin-top:18px;display:flex;gap:12px;align-items:center}
+.btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;background:rgba(255,255,255,0.03);color:inherit}
+.btn.primary{background:linear-gradient(90deg,var(--accent),#5eead4);color:#042014;font-weight:600}
+.small-muted{color:var(--muted);font-size:13px;margin-top:12px}
+.hidden{display:none}
 </style>
 </head>
 <body>
-  <main>
-    <h1>Open WishForm</h1>
-    <p>Click the button below to open WishForm in a new tab or window. Because it will be opened by script, WishForm can call window.close() when it finishes.</p>
-    <button id="openBtn">Open WishForm (auto-close)</button>
+  <main class="container" role="main" id="wrap">
+    <h1 class="brand">WishForm™</h1>
+    <p class="tagline">A suspiciously efficient portal for wildly unrealistic requests.</p>
+
+    <div class="lead" id="prime">
+      <p>Before you begin: take a moment to think about what you really want. When you’re ready, interact with this page to open WishForm.</p>
+    </div>
+
+    <div class="cta" id="ctaArea">
+      <button id="openBtn" class="btn primary">Begin</button>
+      <div id="status" class="small-muted"></div>
+    </div>
+
+    <p class="small-muted">If a popup blocker prevents opening, use the button above.</p>
   </main>
+
 <script>
-  document.getElementById('openBtn').addEventListener('click', function () {
-    // opens Wishform in a script-opened window/tab so it can self-close
-    window.open('Wishform.html', '_blank');
-  });
+(function(){
+  const openBtn = document.getElementById('openBtn');
+  const status = document.getElementById('status');
+  let opened = false;
+
+  function openWish() {
+    if (opened) return;
+    opened = true;
+    // Try to open via script so WishForm can self-close later
+    const w = window.open('Wishform.html', '_blank');
+    if (w) {
+      status.textContent = 'WishForm opened.';
+      openBtn.classList.add('hidden');
+    } else {
+      status.textContent = 'Popup blocked — click Begin again to open.';
+      openBtn.classList.remove('hidden');
+    }
+  }
+
+  // Open on explicit button click
+  openBtn.addEventListener('click', openWish);
+
+  // Also open on first click or keypress anywhere (user gesture)
+  function onceInteraction() {
+    openWish();
+    document.removeEventListener('click', onceInteraction);
+    document.removeEventListener('keydown', onceInteraction);
+  }
+  document.addEventListener('click', onceInteraction, {passive:true});
+  document.addEventListener('keydown', onceInteraction, {passive:true});
+})();
 </script>
 </body>
 </html>
